@@ -16,7 +16,7 @@ class MemoListViewState extends State<MemoListView> {
       context, MaterialPageRoute(builder: (context)=> MemoWritingView())
     );
   }
-  _removeMemo(int memoId){
+  void _removeMemo(int memoId){
     dbProvider.removeMemo(memoId);
   }
   @override
@@ -29,6 +29,14 @@ class MemoListViewState extends State<MemoListView> {
             icon: Icon(Icons.sort),
             onPressed: () {},            
           ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              showSearch(
+                context: context,                
+              );
+            },            
+          ),          
         ],
       ),      
       body:_buildMemoList(),   
@@ -67,7 +75,7 @@ class MemoListViewState extends State<MemoListView> {
       },
       child: ListTile(
         leading: Text(
-          memo.category,
+          memo.updDate,
         ),
         title: Text(
           memo.title,                        
@@ -75,17 +83,8 @@ class MemoListViewState extends State<MemoListView> {
         subtitle: Text(
           memo.contents,
         ),
-        trailing: RaisedButton(
-          child: memo.category=='A'?Icon(Icons.star):Icon(Icons.star_border),                
-          onPressed: () async {
-            
-          } 
-        ),            
-        onTap: (){
-          setState(() {
-              
-          });
-        },
+        trailing: 
+          memo.category=='IMPORTANT'?Icon(Icons.star):Icon(Icons.star_border),                          
       ),
     );
   }

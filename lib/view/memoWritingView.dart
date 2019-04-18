@@ -2,16 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:memo/vo/Memo.dart';
 import 'package:memo/dao/DbProvider.dart';
 
-class MemoWritingView extends StatelessWidget {
+DateTime now = DateTime.now();
 
-  final dbProvider = DbProvider.dbProviderInstance;   
+
+class MemoWritingView extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() => MemoWritingViewState();
+}
+
+class MemoWritingViewState extends State<MemoWritingView> {
+
+  final dbProvider = DbProvider.dbProviderInstance;     
+  final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentsController = TextEditingController();
+  
+  final String _updDate = "${now.year}${now.month}${now.day}";  
+  bool _isImportant = false;
+  void _toggleIsImportant(bool v){   
+    setState(() => _isImportant = v );
+  }
+
+
+  void _saveMemo() async {
+    print('date:'+_updDate);
+    if(_contentsController.text.isNotEmpty){
+      MemoVo memo = MemoVo(
+        title:_titleController.text,
+        contents:_contentsController.text,
+        updDate:_updDate,
+        category:_isImportant?"IMPORTANT":"NOMAL",
+      );
+      await dbProvider.saveMemo(memo);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("write your memo"),
+        actions: <Widget>[
+          Checkbox( 
+            value: _isImportant,
+            onChanged: _toggleIsImportant,                   
+            activeColor: Colors.red,
+          )
+        ],
       ),
       body: Column(
       children: <Widget>[
@@ -20,6 +56,8 @@ class MemoWritingView extends StatelessWidget {
           children: <Widget>[
             Expanded(
               child: TextField(
+                controller: _titleController,
+                onChanged: (v) =>_titleController.text = v,                  
                 decoration: InputDecoration(
                   labelText: "title", 
                   prefixIcon: Icon(Icons.mode_edit)
@@ -34,6 +72,7 @@ class MemoWritingView extends StatelessWidget {
         Expanded(          
           child: TextField(
             controller: _contentsController,
+            onChanged: (v) =>_contentsController.text = v,
             decoration: InputDecoration(
               labelText: "contents",
               prefixIcon: Icon(Icons.mode_edit)
@@ -56,14 +95,5 @@ class MemoWritingView extends StatelessWidget {
     ));
   }
 
-  void _saveMemo() async {
-    final memo = MemoVo(      
-      title:"title1",
-      contents:"contents1",
-      updDate:"20190101",
-      category:"A",
-    );
-    print('memo::${memo.title}');
-    await dbProvider.saveMemo(memo);
-  }
+
 }
