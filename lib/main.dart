@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memo/view/memoList.dart';
-
-
+import 'package:memo/view/MemoListView.dart';
 
 void main() => runApp(MemoApp());
 
@@ -12,7 +10,7 @@ class MemoApp extends StatelessWidget {
     return MaterialApp(
       title: 'Memo',
       theme: ThemeData(
-        primarySwatch: Colors.blue, 
+        primarySwatch: Colors.lightGreen, 
       ),
       home: MemoListView(),
     );
