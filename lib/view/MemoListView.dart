@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memo/dao/DbProvider.dart';
+import 'package:memo/view/MemoDescView.dart';
 import 'package:memo/vo/Memo.dart';
 import 'package:memo/view/MemoWritingView.dart';
 
@@ -14,6 +15,11 @@ class MemoListViewState extends State<MemoListView> {
   void _routeMemoWriting(){
     Navigator.push(
       context, MaterialPageRoute(builder: (context)=> MemoWritingView())
+    );
+  }
+  void _routeMemoDesc(){
+    Navigator.push(
+      context, MaterialPageRoute(builder: (context)=> MemoDescView())
     );
   }
   void _removeMemo(int memoId){
@@ -74,6 +80,7 @@ class MemoListViewState extends State<MemoListView> {
         _removeMemo(memo.id);
       },
       child: ListTile(
+        onTap: _routeMemoDesc,        
         leading: Text(
           memo.updDate,
         ),
