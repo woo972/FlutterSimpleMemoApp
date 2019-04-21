@@ -59,6 +59,30 @@ class DbProvider{
     });       
   }
 
+  Future<MemoVo> getMemoById(int memoId) async{
+    final db = await database;    
+    var rslt = await db.rawQuery(
+      "select * from memo where id=?",
+      [memoId]
+    );    
+    return MemoVo(
+        id: rslt.first["id"],
+        title: rslt.first["title"],
+        contents: rslt.first["contents"],
+        category: rslt.first["category"],
+        updDate: rslt.first["upd_date"],
+    );
+  }
+
+  Future<void> updateMemo(MemoVo memo) async{
+    final db = await database;
+    await db.rawUpdate(
+      "update memo set title=?, contents=?, upd_date=?, category=?"
+      "where id=?",
+      [memo.title, memo.contents, memo.updDate, memo.category, memo.id]
+    );
+  }
+
   Future<void> removeMemo(int memoId) async{
     final db = await database;
     await db.rawDelete(

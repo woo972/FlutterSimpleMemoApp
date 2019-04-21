@@ -24,7 +24,6 @@ class MemoWritingViewState extends State<MemoWritingView> {
 
 
   void _saveMemo() async {
-    print('date:'+_updDate);
     if(_contentsController.text.isNotEmpty){
       MemoVo memo = MemoVo(
         title:_titleController.text,
@@ -57,10 +56,8 @@ class MemoWritingViewState extends State<MemoWritingView> {
             Expanded(
               child: TextField(
                 controller: _titleController,
-                onChanged: (v) =>_titleController.text = v,                  
                 decoration: InputDecoration(
                   labelText: "title", 
-                  prefixIcon: Icon(Icons.mode_edit)
                 ),
               ),              
             ),
@@ -72,10 +69,9 @@ class MemoWritingViewState extends State<MemoWritingView> {
         Expanded(          
           child: TextField(
             controller: _contentsController,
-            onChanged: (v) =>_contentsController.text = v,
+            maxLines: 100,
             decoration: InputDecoration(
               labelText: "contents",
-              prefixIcon: Icon(Icons.mode_edit)
             ),
           ),
         ),
