@@ -12,6 +12,9 @@ class MemoListView extends StatefulWidget {
 
 class MemoListViewState extends State<MemoListView> {
   final dbProvider = DbProvider.dbProviderInstance;
+
+  bool _reverseSort=false;
+
   void _routeMemoWriting() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MemoWritingView()));
@@ -38,7 +41,37 @@ class MemoListViewState extends State<MemoListView> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.sort),
-            onPressed: () {},
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context){
+                  return AlertDialog(
+                    title: Text("sort by ..."),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("upd date"),
+                        onPressed: (){
+                          setState(() {
+                            _reverseSort = !_reverseSort;
+
+                          });
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("title"),
+                        onPressed: (){
+                          setState(() {
+                            _reverseSort = !_reverseSort;
+
+                          });
+                        },
+                        // onPressed: ,
+                      ),
+                    ],
+                  );
+                }
+              );
+            },
           ),
           IconButton(
             icon: Icon(Icons.search),
@@ -52,6 +85,7 @@ class MemoListViewState extends State<MemoListView> {
       ),
       body: _buildMemoList(),
       floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
         onPressed: _routeMemoWriting,
       ),
     );
@@ -69,6 +103,8 @@ class MemoListViewState extends State<MemoListView> {
                   MemoVo item = snapshot.data[idx];
                   return _buildRow(item);
                 });
+          }else{
+            return Container(width: 0, height: 0,);
           }
         });
   }
@@ -81,7 +117,7 @@ class MemoListViewState extends State<MemoListView> {
         _removeMemo(memo.id);
       },
       child: ListTile(
-          onTap: () => _routeMemoDesc(memo.id),
+          // onTap: () => _routeMemoDesc(memo.id),
           leading: Text(
             memo.updDate,
           ),
@@ -93,17 +129,17 @@ class MemoListViewState extends State<MemoListView> {
           ),
           trailing: ButtonBar(
             children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.share),
-                onPressed: () {                  
-                  _shareMemo(memo);
-                },
+              GestureDetector(
+                child: Icon(Icons.share),                
+                onTap: (){
+                  _shareMemo(memo);  
+                } 
               ),
               memo.category == 'IMPORTANT'
                   ? Icon(Icons.star)
                   : Icon(Icons.star_border),
-            ],
-          )),
+        ],
+      )),
     );
   }
 }

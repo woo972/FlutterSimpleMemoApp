@@ -71,7 +71,7 @@ class MemoWritingViewState extends State<MemoWritingView> {
             controller: _contentsController,
             maxLines: 100,
             decoration: InputDecoration(
-              labelText: "contents",
+              labelText: "contents",              
             ),
           ),
         ),
