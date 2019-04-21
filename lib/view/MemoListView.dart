@@ -14,12 +14,41 @@ class MemoListViewState extends State<MemoListView> {
   final dbProvider = DbProvider.dbProviderInstance;
 
   bool _reverseSort=false;
+  String _searchText="";
+  Icon _searchIcon = Icon(Icons.search);
+  Widget _appBarTitle = Text('search');
+  TextEditingController _filter = TextEditingController();
+  List<MemoVo> memoList = List<MemoVo>();
+  List<MemoVo> tempList = List<MemoVo>();
 
+
+  MemoListViewState(){
+    _filter.addListener((){
+      if(_filter.text.isEmpty){
+        setState(() {
+          _searchText=""; 
+        });        
+      }else{
+        setState(() {
+          _searchText = _filter.text;              
+          memoList = List<MemoVo>();
+          for(int idx=0; idx<tempList.length; idx++){
+            if(tempList[idx].contents.contains(_searchText)){
+              memoList.add(tempList[idx]);
+            }
+          }
+          
+        });
+
+      }
+    });
+  }
+  
   void _routeMemoWriting() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MemoWritingView()));
   }
-
+  
   void _routeMemoDesc(int memoId) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MemoDescView(memoId)));
@@ -32,12 +61,48 @@ class MemoListViewState extends State<MemoListView> {
   void _shareMemo(MemoVo memo){
     Share.share('${memo.title}\n${memo.contents}');
   }
+  void _sortMemoList(String baseCol){
+    if(baseCol == 'updDate'){
+      memoList.sort((a, b){ 
+        int rslt = a.updDate.toString().toLowerCase().compareTo(
+            b.updDate.toString().toLowerCase());
+        return _reverseSort? rslt: -1*rslt;
+      });
+    }else{
+      memoList.sort((a, b){
+        int rslt =  a.title.toString().toLowerCase().compareTo(
+            b.title.toString().toLowerCase());
+        return _reverseSort? rslt: -1*rslt;
+      });
+    }
+  }
+
+  void _showSearch(){
+    setState((){
+      if (this._searchIcon.icon == Icons.search) {
+        this._searchIcon = new Icon(Icons.close);
+        this._appBarTitle = new TextField(
+          controller: _filter,
+          decoration: new InputDecoration(
+            prefixIcon: new Icon(Icons.search),
+            hintText: 'Search...'
+          ),
+        );
+      } else {
+        this._searchIcon = new Icon(Icons.search);
+        this._appBarTitle = new Text('MemoList');
+        _filter.clear();
+      }      
+    });
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('memoList'),
+        title: _appBarTitle,
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.sort),
@@ -53,8 +118,8 @@ class MemoListViewState extends State<MemoListView> {
                         onPressed: (){
                           setState(() {
                             _reverseSort = !_reverseSort;
-
                           });
+                            _sortMemoList("updDate");
                         },
                       ),
                       FlatButton(
@@ -62,8 +127,9 @@ class MemoListViewState extends State<MemoListView> {
                         onPressed: (){
                           setState(() {
                             _reverseSort = !_reverseSort;
-
+                            print(_reverseSort);
                           });
+                            _sortMemoList("title");
                         },
                         // onPressed: ,
                       ),
@@ -74,11 +140,9 @@ class MemoListViewState extends State<MemoListView> {
             },
           ),
           IconButton(
-            icon: Icon(Icons.search),
+            icon: _searchIcon,
             onPressed: () {
-              showSearch(
-                context: context,
-              );
+              _showSearch();
             },
           ),
         ],
@@ -96,11 +160,13 @@ class MemoListViewState extends State<MemoListView> {
         future: DbProvider.dbProviderInstance.getMemoList(),
         builder: (BuildContext context, AsyncSnapshot<List<MemoVo>> snapshot) {
           if (snapshot.hasData) {
+            memoList = snapshot.data;
+            tempList = memoList;            
             return ListView.builder(
                 padding: EdgeInsets.all(10),
-                itemCount: snapshot.data.length,
+                itemCount: memoList.length,
                 itemBuilder: (BuildContext context, int idx) {
-                  MemoVo item = snapshot.data[idx];
+                  MemoVo item = memoList[idx];
                   return _buildRow(item);
                 });
           }else{
